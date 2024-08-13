@@ -27,7 +27,7 @@ export default function MovieTable() {
       {movies.status === "pending" ? (
         "loading"
       ) : movies.status === "error" ? (
-        <span>Error: {movies.error.message}</span>
+        <span className={"text-red-600"}>Error: {movies.error.message}</span>
       ) : (
         movies.data.map((movie) => <p>{movie.title}</p>)
       )}
