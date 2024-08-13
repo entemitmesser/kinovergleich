@@ -6,7 +6,7 @@ function ListGroup() {
 
   return (
     <>
-      <h1>List</h1>
+      <h1>Cities</h1>
       <ul className="list-group">
         {cities.map((item, index) => (
           <li
