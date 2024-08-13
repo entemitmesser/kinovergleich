@@ -1,9 +1,11 @@
 from scrapers.mathaeser_scraper import mScraper
 from scrapers.cinemaxx_scraper import cmScraper
 from flask import Flask, jsonify, send_from_directory
+from flask_cors import CORS
 import sqlite3
 
 app = Flask(__name__, static_folder='web_interface')
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 conn = sqlite3.connect("data/movie_data.db")
 db = conn.cursor()
 mt = mScraper()
