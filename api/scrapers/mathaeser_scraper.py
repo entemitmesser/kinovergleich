@@ -49,7 +49,7 @@ class mScraper():
                 try:
                     price.append(field.find("div", class_ = "prog-nav__price").text.replace(",", "."))
                 except:
-                    price.append("Nicht mehr Buchbar\u20ac")
+                    price.append("Nicht mehr Buchbar")
 
             movie_date_price_dict[movie_title] = price
 
