@@ -14,16 +14,17 @@ cm = cmScraper()
 #db setup
 try:
     db.execute("DROP TABLE movies")
-    db.execute("""CREATE TABLE movies (
-            title text,
-            playtime_price text,
-            location text,
-            url text
-    )""")
-    conn.commit()
-    conn.close()
-except sqlite3.OperationalError:
-    print("Database alrady existent")
+except:
+    pass
+db.execute("""CREATE TABLE movies (
+        title text,
+        playtime_price text,
+        location text,
+        url text
+)""")
+conn.commit()
+conn.close()
+
 
 @app.route('/')
 def index():
