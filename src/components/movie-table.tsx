@@ -90,12 +90,12 @@ export default function MovieTable() {
               cinema_name: movie.location.name,
               playtime_price: JSON.parse(
                 movie.playtime_price.replace(/'/g, '"'),
-              ).map((item: string) => {
+              ).map((item: string, index: number) => {
                 return (
-                  <>
+                  <div key={index}>
                     {item}
                     <br />
-                  </>
+                  </div>
                 );
               }),
             };

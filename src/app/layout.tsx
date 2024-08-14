@@ -3,6 +3,8 @@ import TanstackQueryClientProvider from "~/components/tanstack-query-client-prov
 
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
+import Navbar from "~/components/navbar";
+import { ThemeProvider } from "~/components/theme-provider";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -16,7 +18,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
       <body>
-        <TanstackQueryClientProvider>{children}</TanstackQueryClientProvider>
+        <TanstackQueryClientProvider>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <Navbar />
+            {children}
+          </ThemeProvider>
+        </TanstackQueryClientProvider>
       </body>
     </html>
   );
