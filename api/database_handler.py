@@ -1,4 +1,3 @@
-import sqlite3
 from flask import jsonify
 
 class databaseHandler():
@@ -33,7 +32,7 @@ class databaseHandler():
     def get_movies_by_date(self, date):
         all_movies = []
 
-        self.db_cursor.execute("SELECT * FROM movies WHERE title = (select title from playtimes where raw_date=:date)", {"date":date})
+        self.db_cursor.execute("SELECT * FROM movies WHERE title IN (select title from playtimes where raw_date=:date)", {"date":date})
         list_format_movies = self.db_cursor.fetchall()
         for data_block in list_format_movies:
             print(data_block[0])
@@ -42,7 +41,7 @@ class databaseHandler():
             item["location"] = {"name":data_block[1], "url":data_block[2]}
             playtimes_array = []
             #getting the playtimes from the other table
-            self.db_cursor.execute("SELECT * FROM playtimes WHERE title=:title", {"title":str(data_block[0])})
+            self.db_cursor.execute("SELECT * FROM playtimes WHERE title=:title AND raw_date =:date", {"title":str(data_block[0]), "date":date})
             all_query_results = self.db_cursor.fetchall()
             for query_result in all_query_results:
                 formatted_element = f'{query_result[3]} +++ {query_result[1]}'
