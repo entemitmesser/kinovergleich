@@ -23,6 +23,8 @@ import React from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { ArrowUpDown } from "lucide-react";
+import { DatePicker } from "./date-picker";
+import { format } from "date-fns";
 
 const movieData = z.array(
   z.object({
@@ -67,12 +69,17 @@ export const columns: ColumnDef<Movie>[] = [
 ];
 
 export default function MovieTable() {
+  const [date, setDate] = React.useState<Date>();
   const movies = useQuery({
     queryFn: async () => {
-      const result = await fetch("http://127.0.0.1:5000/movies");
+      const result = await fetch(
+        date
+          ? `http://127.0.0.1:5000/movies?date=${format(date.toString(), "dd-MM-yyyy")}`
+          : "http://127.0.0.1:5000/movies",
+      );
       return movieData.parse(await result.json());
     },
-    queryKey: ["movies"],
+    queryKey: ["movies", date],
   });
 
   return (
@@ -83,6 +90,8 @@ export default function MovieTable() {
         <span className={"text-red-600"}>Error: {movies.error.message}</span>
       ) : (
         <DataTable
+          setDate={setDate}
+          date={date}
           columns={columns}
           data={movies.data.map((movie) => {
             return {
@@ -109,11 +118,15 @@ export default function MovieTable() {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  date: Date | undefined;
+  setDate: (type: Date) => void;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  date,
+  setDate,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -145,6 +158,7 @@ export function DataTable<TData, TValue>({
           }
           className="max-w-sm"
         />
+        <DatePicker date={date} setDate={setDate} />
       </div>
       <div className="w-full rounded-md border">
         <Table className="w-full">
