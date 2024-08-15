@@ -4,3 +4,8 @@ Tabelle
         playtime_price
         location
         url
+    playtimes
+        title
+        price
+        raw_date
+        date

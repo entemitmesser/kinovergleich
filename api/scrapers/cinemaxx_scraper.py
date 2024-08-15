@@ -35,6 +35,8 @@ class cmScraper():
 
     def getMovieData(self):
         movie_data = {}
+        #Structure: {title: [[title, price, raw_date, date], ...]}
+        playtime_data = {}
         with open("data/cinemaxx_all.json", "r") as f:
             data = json.loads(f.read())
 
@@ -47,6 +49,10 @@ class cmScraper():
                 # Extract movie title
                 title = movie["Title"]
                 movie_data[title] = {}
+                try:
+                    playtime_data[title]
+                except KeyError:
+                    playtime_data[title] = []
 
                 # Iterate over cinemas and schedules
                 for cinema in movie["WhatsOnAlphabeticCinemas"]:
@@ -55,9 +61,18 @@ class cmScraper():
                         # Extract playtime
                         obj_date = datetime.strptime(schedule["Time"], "%Y-%m-%d %H:%M:%S")
                         pretty_date = obj_date.strftime("%a. %d.%m %H:%M")
+                        uniform_date = obj_date.strftime("%d/%m/%Y")
                         playtime.append(pretty_date)
-                        movie_data[title]["playtime"] = playtime
-                        movie_data[title]["price"] = "ab 8,99€"
+                        #movie_data[title]["playtime"] = playtime
+                        #movie_data[title]["price"] = "ab 8,99€"
+                        #movie_data[title]["raw_date"] = uniform_date
+                        data_block = [
+                            title,
+                            "ab 8,99€",
+                            date_str,
+                            playtime
+                        ]
+                        playtime_data[title].append(data_block)
 
                         # Extract duration (if available)
                         for param in movie["FilmParams"]:
@@ -70,6 +85,9 @@ class cmScraper():
 
                         #print()  # Print an empty line between schedules
             
-        return(movie_data)
+        return(movie_data, playtime_data)
 
-#print(cmScraper().getMovieData())
+#mdata, pdata = cmScraper().getMovieData()
+#print(mdata)
+#print("\n\n\n\n\n\n\n\n")
+#print(pdata)

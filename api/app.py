@@ -1,29 +1,14 @@
 from scrapers.mathaeser_scraper import mScraper
 from scrapers.cinemaxx_scraper import cmScraper
-from flask import Flask, jsonify, send_from_directory
+from database_handler import databaseHandler
+from flask import Flask, jsonify, send_from_directory, request
 from flask_cors import CORS
 import sqlite3
 
 app = Flask(__name__, static_folder='web_interface')
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
-conn = sqlite3.connect("data/movie_data.db")
-db = conn.cursor()
-mt = mScraper()
-cm = cmScraper()
 
-#db setup
-try:
-    db.execute("DROP TABLE movies")
-except:
-    pass
-db.execute("""CREATE TABLE movies (
-        title text,
-        playtime_price text,
-        location text,
-        url text
-)""")
-conn.commit()
-conn.close()
+
 
 
 @app.route('/')
@@ -32,20 +17,16 @@ def index():
 
 @app.route('/movies')
 def get_movies():
-    all_movies = []
+    date_arg_value = request.args.get("date")
 
-    local_c = sqlite3.connect("data/movie_data.db")
-    local_db = local_c.cursor()
-    local_db.execute("SELECT * FROM movies")
-    list_format_movies = local_db.fetchall()
-    for data_block in list_format_movies:
-        item = {}
-        item["title"] = data_block[0]
-        item["playtime_price"] = data_block[1]
-        item["location"] = {"name":data_block[2], "url":data_block[3]}
-        all_movies.append(item)
-    
-    return jsonify(all_movies)
+    if not date_arg_value:
+        conn = sqlite3.connect("data/movie_data.db")
+        db_handler = databaseHandler(conn)
+        return(db_handler.get_all_movie_data())
+    else:
+        conn = sqlite3.connect("data/movie_data.db")
+        db_handler = databaseHandler(conn)
+        return(db_handler.get_movies_by_date(date_arg_value))
 
 @app.route('/titles')
 def get_titles():
@@ -59,75 +40,9 @@ def get_titles():
 
     return formatted
 
-def mathaeser():
-    movies = []
-    for movie in mt.getAllMovies():
-        movie_data = {}
-        movie_data["title"] = movie
-        playtime_price_tuples = list(zip(mt.findDatesForMovies()[movie], mt.findPriceForMovies()[movie]))
 
-        movie_data["playtime_price"] = []
-        for tuple in playtime_price_tuples:
-            playtime = tuple[0]
-            price = tuple[1]
-            movie_data["playtime_price"].append(f"{playtime} +++ {price}\n")
-
-        movie_data["location"] = {"name":"Mathäser Filmpalast", "url":"https://www.mathaeser.de/mm/"}
-        movies.append(movie_data)
-
-    return(movies)
-
-def cinemaxx():
-    movies = []
-    for movie in cm.getMovieData():
-        movie_data = {}
-        movie_data["title"] = movie
-        playtime_price_tuples = list(zip(cm.getMovieData()[movie]["playtime"], cm.getMovieData()[movie]["price"]))
-        #print(playtime_price_tuples)
-
-        movie_data["playtime_price"] = []
-
-        for tuple in playtime_price_tuples:
-            playtime = tuple[0]
-            price = cm.getMovieData()[movie]["price"].replace(",", ".")
-            movie_data["playtime_price"].append(f"{playtime} +++ {price}\n")
-
-        movie_data["location"] = {"name":"Cinemaxx", "url":"https://www.cinemaxx.de/kinoprogramm/munchen/"}
-        movies.append(movie_data)
-
-    return(movies)
-
-def populate_db():
-
-    all_movies = []
-    #mathaeser
-    for movie in mathaeser():
-        all_movies.append(movie)
-
-    #cinemaxx
-    for movie in cinemaxx():
-        all_movies.append(movie)
-
-    local_c = sqlite3.connect("data/movie_data.db")
-    local_db = local_c.cursor()
-    local_db.execute(f"SELECT * FROM movies WHERE title=?", (f'{movie}',))
-
-    for movie_data in all_movies:
-        title = movie_data["title"]
-        ptp = str(movie_data["playtime_price"])
-        location = movie_data["location"]["name"]
-        url = movie_data["location"]["url"]
-        #if current_ptp[0] != ptp:
-        query="""
-        INSERT INTO movies 
-        VALUES (:title, :playtime_price, :location, :url)
-
-        """
-        local_db.execute(query, {"title":title, "playtime_price":ptp,"location":location, "url":url})
-        local_c.commit()
 
 
 if __name__ == '__main__':
-    populate_db()
     app.run(debug=True)
     
