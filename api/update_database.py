@@ -2,9 +2,14 @@
 from scrapers.mathaeser_scraper import mScraper
 from scrapers.cinemaxx_scraper import cmScraper
 import sqlite3
+import os
 
 mt = mScraper()
 cm = cmScraper()
+try:
+    os.mkdir("data")
+except:
+    pass
 conn = sqlite3.connect("data/movie_data.db")
 db = conn.cursor()
 
