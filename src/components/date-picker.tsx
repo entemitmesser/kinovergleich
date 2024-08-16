@@ -29,7 +29,7 @@ export function DatePicker(props: {
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
           {props.date ? (
-            format(props.date, "dd-MM-yyyy")
+            format(props.date, "iii. d. MMMM")
           ) : (
             <span>Nach Datum Filtern</span>
           )}

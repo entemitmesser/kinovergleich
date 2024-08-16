@@ -41,7 +41,7 @@ class databaseHandler():
         self.db_cursor.execute("SELECT * FROM movies WHERE title IN (select title from playtimes where raw_date=:date)", {"date":date})
         list_format_movies = self.db_cursor.fetchall()
         for data_block in list_format_movies:
-            print(data_block[0])
+            #print(data_block[0])
             item = {}
             item["title"] = data_block[0]
             item["location"] = {"name":data_block[1], "url":data_block[2]}

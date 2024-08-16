@@ -1,6 +1,7 @@
 #!/Users/moritzruttkowski/Mucino/.venv/bin/python3
 from scrapers.mathaeser_scraper import mScraper
 from scrapers.cinemaxx_scraper import cmScraper
+from datetime import datetime
 import sqlite3
 import os
 
@@ -35,21 +36,30 @@ conn.close()
 
 def mathaeser():
     movies = []
+    playtime_data = {}
     for movie in mt.getAllMovies():
+        #Structure: {title: [[title, price, raw_date, date], ...]}
         movie_data = {}
         movie_data["title"] = movie
+        playtime_data[movie] = []
         playtime_price_tuples = list(zip(mt.findDatesForMovies()[movie], mt.findPriceForMovies()[movie]))
 
-        movie_data["playtime_price"] = []
-        for tuple in playtime_price_tuples:
-            playtime = tuple[0]
-            price = tuple[1]
-            movie_data["playtime_price"].append(f"{playtime} +++ {price}\n")
+        for index, (item, price) in enumerate(playtime_price_tuples):
+            data_row: list = []
+            playtime = item[4:] + "2024"
+            try:
+                playtime_Date_object = datetime.strptime(str(playtime), " %d.%m.%Y")
+                date = playtime_Date_object.strftime("%a %d.%m")
+                raw_date = playtime_Date_object.strftime("%d-%m-%Y")
+                data_row.extend([movie, price, raw_date, date])
+            except:
+                data_row.extend([movie, "N/A", "N/A", "N/A"])
+            playtime_data[movie].append(data_row)
 
         movie_data["location"] = {"name":"Mathäser Filmpalast", "url":"https://www.mathaeser.de/mm/"}
         movies.append(movie_data)
 
-    return(movies)
+    return(movies, playtime_data)
 
 def cinemaxx():
     movies = []
@@ -75,13 +85,12 @@ def cinemaxx():
 
 def populate_db():
     cm_movie_data, cm_playtime_data = cinemaxx()
+    mt_movie_data, mt_playtime_data = mathaeser()
     all_movies = []
     local_c = sqlite3.connect("data/movie_data.db")
     local_db = local_c.cursor()
     #local_db.execute(f"SELECT * FROM movies WHERE title=?", (f'{movie}',))
     #mathaeser
-    for movie in mathaeser():
-        all_movies.append(movie)
 
     #cinemaxx
     for movie in cm_movie_data:
@@ -100,8 +109,24 @@ def populate_db():
                 local_db.execute(query, {"title":movie_title, "price":price, "raw_date":raw_date, "date":date})
                 local_c.commit()
 
-            
+    #mathäser
+    for movie in mt_movie_data:
+        all_movies.append(movie)
+    for element_movie_playtimes in mt_playtime_data:
+        for day in mt_playtime_data[element_movie_playtimes]:
+            movie_title = day[0]
+            price =  day[1]
+            raw_date = day[2]
+            date = day[3]
+            query="""
+            INSERT INTO playtimes 
+            VALUES (:title, :price, :raw_date, :date)
+    
+            """
+            local_db.execute(query, {"title":movie_title, "price":price, "raw_date":raw_date, "date":date})
+            local_c.commit()
 
+            
     for movie_data in all_movies:
         title = movie_data["title"]
         #ptp = str(movie_data["playtime_price"])
