@@ -1,4 +1,3 @@
-import Link from "next/link";
 import MovieTable from "~/components/movie-table";
 
 export default function HomePage() {
