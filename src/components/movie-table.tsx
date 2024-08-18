@@ -10,13 +10,13 @@ import {
   TableRow,
 } from "./ui/table";
 import {
-  ColumnDef,
-  ColumnFiltersState,
+  type ColumnDef,
+  type ColumnFiltersState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
-  SortingState,
+  type SortingState,
   useReactTable,
 } from "@tanstack/react-table";
 import React from "react";
@@ -32,14 +32,14 @@ const movieData = z.array(
       name: z.string(),
       url: z.string(),
     }),
-    playtime_price: z.string(),
+    playtime_price_formatted_json: z.string(),
     title: z.string(),
   }),
 );
 
 type Movie = {
   cinema_name: string;
-  playtime_price: React.ReactNode;
+  playtime_price: string;
   title: string;
 };
 
@@ -61,6 +61,20 @@ export const columns: ColumnDef<Movie>[] = [
   {
     accessorKey: "playtime_price",
     header: "Spielzeiten & Preis",
+    cell: ({ cell }) => {
+      // Sanitize the JSON
+      return z
+        .array(z.string())
+        .parse(JSON.parse(z.string().parse(cell.getValue()).replace(/'/g, '"')))
+        .map((item: string, index: number) => {
+          return (
+            <div key={index}>
+              {item}
+              <br />
+            </div>
+          );
+        });
+    },
   },
   {
     accessorKey: "cinema_name",
@@ -97,16 +111,7 @@ export default function MovieTable() {
             return {
               title: movie.title,
               cinema_name: movie.location.name,
-              playtime_price: JSON.parse(
-                movie.playtime_price.replace(/'/g, '"'),
-              ).map((item: string, index: number) => {
-                return (
-                  <div key={index}>
-                    {item}
-                    <br />
-                  </div>
-                );
-              }),
+              playtime_price: movie.playtime_price_formatted_json,
             };
           })}
         ></DataTable>
@@ -119,7 +124,7 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   date: Date | undefined;
-  setDate: (type: Date) => void;
+  setDate: (type: Date | undefined) => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -148,8 +153,8 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="w-full">
-      <div className="flex items-center py-4">
+    <div className="w-full p-6">
+      <div className="flex items-center gap-4 py-4">
         <Input
           placeholder="Filter nach Titel..."
           value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
@@ -189,8 +194,10 @@ export function DataTable<TData, TValue>({
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {/* I removed the flexRender, because he was annoying nobody could answer me what he is doing */}
-                      {cell.getContext().getValue() as Movie[keyof Movie]}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>

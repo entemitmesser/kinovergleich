@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { format } from "date-fns";
+import { de } from "date-fns/locale";
 import { Calendar as CalendarIcon } from "lucide-react";
 
 import { cn } from "~/lib/utils";
@@ -15,7 +16,7 @@ import {
 
 export function DatePicker(props: {
   date: Date | undefined;
-  setDate: (type: Date) => void;
+  setDate: (type: Date | undefined) => void;
 }) {
   return (
     <Popover>
@@ -29,7 +30,7 @@ export function DatePicker(props: {
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
           {props.date ? (
-            format(props.date, "iii. d. MMMM")
+            format(props.date, "PPP", { locale: de })
           ) : (
             <span>Nach Datum Filtern</span>
           )}

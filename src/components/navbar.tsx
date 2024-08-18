@@ -4,14 +4,11 @@ import * as React from "react";
 import Link from "next/link";
 import {
   NavigationMenu,
-  NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "./ui/navigation-menu";
-import { cn } from "~/lib/utils";
 import { useTheme } from "next-themes";
 import {
   DropdownMenu,
@@ -37,7 +34,7 @@ export default function Navbar() {
           <NavigationMenuItem>
             <Link href="/about" legacyBehavior passHref>
               <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                About Us
+               Über uns
               </NavigationMenuLink>
             </Link>
           </NavigationMenuItem>
