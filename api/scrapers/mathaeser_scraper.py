@@ -54,4 +54,26 @@ class mScraper():
             movie_date_price_dict[movie_title] = price
 
         return(movie_date_price_dict)
+    
+    def findPosterForMovies(self):
+        movie_poster_dict = {}
 
+        for film in self.film_cards:
+            movie_title = film.h2.a.text
+            info_field_list = film.find_all("img", class_ = "img-fluid")
+            img = []
+
+            #print(movie_title)
+
+            for field in info_field_list:
+                try:
+                    img_link: str = field.get("src")
+                    if img_link.startswith("https://"):
+                        img.append(img_link)
+                except:
+                    img.append("No Poster Found")
+
+            img_link_out = img[1]
+            movie_poster_dict[movie_title] = img_link_out
+
+        return(movie_poster_dict)

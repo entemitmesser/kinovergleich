@@ -23,7 +23,8 @@ except:
 db.execute("""CREATE TABLE movies (
         title text,
         location text,
-        url text
+        url text,
+           poster_url text
 )""")
 db.execute("""CREATE TABLE playtimes (
         title text,
@@ -36,11 +37,11 @@ conn.close()
 
 def mathaeser():
     movies = []
-    playtime_data = {}
+    playtime_data = {} #Structure: {title: [[title, price, raw_date, date], ...]}
     for movie in mt.getAllMovies():
-        #Structure: {title: [[title, price, raw_date, date], ...]}
         movie_data = {}
         movie_data["title"] = movie
+        movie_data["poster_url"] = mt.findPosterForMovies()[movie]
         playtime_data[movie] = []
         playtime_price_tuples = list(zip(mt.findDatesForMovies()[movie], mt.findPriceForMovies()[movie]))
 
@@ -67,6 +68,7 @@ def cinemaxx():
     for movie in movie_table_data:
         movie_data = {}
         movie_data["title"] = movie
+        movie_data["poster_url"] = movie_table_data[movie]["poster"]
         #movie_data["raw_date"] = cm.getMovieData()[movie]["raw_date"]
         #playtime_price_tuples = list(zip(cm.getMovieData()[movie]["playtime"], cm.getMovieData()[movie]["price"]))
         ##print(playtime_price_tuples)
@@ -129,6 +131,7 @@ def populate_db():
             
     for movie_data in all_movies:
         title = movie_data["title"]
+        poster_url = str(movie_data["poster_url"])
         #ptp = str(movie_data["playtime_price"])
         location = movie_data["location"]["name"]
         url = movie_data["location"]["url"]
@@ -136,10 +139,10 @@ def populate_db():
         #if current_ptp[0] != ptp:
         query="""
         INSERT INTO movies 
-        VALUES (:title, :location, :url)
+        VALUES (:title, :location, :url, :poster_url)
 
         """
-        local_db.execute(query, {"title":title, "location":location, "url":url, })
+        local_db.execute(query, {"title":title, "location":location, "url":url, "poster_url": poster_url})
         local_c.commit()
 
 if True:

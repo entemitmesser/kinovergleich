@@ -11,7 +11,7 @@ class DatabaseHandler:
         self.db_cursor.execute("SELECT * FROM movies")
         list_format_movies = self.db_cursor.fetchall()
         for data_block in list_format_movies:
-            item = {"title": data_block[0], "location": {"name": data_block[1], "url": data_block[2]}}
+            item = {"title": data_block[0], "location": {"name": data_block[1], "url": data_block[2]}, "poster": data_block[3]}
             playtimes_array = []
             #getting the playtimes from the other table
             self.db_cursor.execute("SELECT raw_date, price FROM playtimes WHERE title=:title", {"title":str(data_block[0])})

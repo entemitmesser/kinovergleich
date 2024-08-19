@@ -48,7 +48,9 @@ class cmScraper():
             for movie in data[date_str]["WhatsOnAlphabeticFilms"]:
                 # Extract movie title
                 title = movie["Title"]
+                poster = movie["Poster"]
                 movie_data[title] = {}
+                movie_data[title]["poster"] = poster
                 try:
                     playtime_data[title]
                 except KeyError:
@@ -61,7 +63,6 @@ class cmScraper():
                         # Extract playtime
                         obj_date = datetime.strptime(schedule["Time"], "%Y-%m-%d %H:%M:%S")
                         pretty_date = obj_date.strftime("%a. %d.%m %H:%M")
-                        uniform_date = obj_date.strftime("%d/%m/%Y")
                         playtime.append(pretty_date)
                         #movie_data[title]["playtime"] = playtime
                         #movie_data[title]["price"] = "ab 8,99€"
