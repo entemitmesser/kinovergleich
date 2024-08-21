@@ -5,6 +5,19 @@
 await import("./src/env.js");
 
 /** @type {import("next").NextConfig} */
-const config = {};
+const config = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "cdn.cinemaxx.de",
+      },
+      {
+        protocol: "https",
+        hostname: "trailer.kinopolis.de",
+      },
+    ],
+  },
+};
 
 export default config;
