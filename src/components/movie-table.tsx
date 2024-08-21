@@ -25,13 +25,15 @@ import { Button } from "./ui/button";
 import { ArrowUpDown } from "lucide-react";
 import { DatePicker } from "./date-picker";
 import { format } from "date-fns";
+import Image from "next/image";
 
 const movieData = z.array(
   z.object({
     location: z.object({
       name: z.string(),
-      url: z.string(),
+      url_website_cinema: z.string(),
     }),
+    poster_url: z.string(),
     playtime_price_formatted_json: z.string(),
     title: z.string(),
   }),
@@ -40,6 +42,7 @@ const movieData = z.array(
 type Movie = {
   cinema_name: string;
   playtime_price: string;
+  poster: string;
   title: string;
 };
 
@@ -55,6 +58,21 @@ export const columns: ColumnDef<Movie>[] = [
           Titel
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
+      );
+    },
+  },
+  {
+    accessorKey: "poster",
+    header: "Poster",
+    cell: ({ cell, row }) => {
+      return (
+        <div className="relative aspect-[7/10] w-36">
+          <Image
+            src={z.string().parse(cell.getValue())}
+            alt={row.original.title + " Poster"}
+            fill
+          />
+        </div>
       );
     },
   },
@@ -112,6 +130,7 @@ export default function MovieTable() {
               title: movie.title,
               cinema_name: movie.location.name,
               playtime_price: movie.playtime_price_formatted_json,
+              poster: movie.poster_url,
             };
           })}
         ></DataTable>
