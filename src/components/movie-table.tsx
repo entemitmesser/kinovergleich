@@ -66,10 +66,11 @@ export const columns: ColumnDef<Movie>[] = [
     header: "Poster",
     cell: ({ cell, row }) => {
       return (
-        <div className="relative aspect-[7/10] w-36">
+        <div className="relative aspect-[7/10] w-40">
           <Image
             src={z.string().parse(cell.getValue())}
             alt={row.original.title + " Poster"}
+            className="rounded"
             fill
           />
         </div>
