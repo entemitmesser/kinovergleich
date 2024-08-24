@@ -21,7 +21,7 @@ import { Moon, Sun } from "lucide-react";
 
 export default function Navbar() {
   return (
-    <div className="relative flex w-full justify-center pt-1">
+    <div className="relative flex w-full justify-center p-5">
       <NavigationMenu>
         <NavigationMenuList>
           <NavigationMenuItem>
@@ -34,13 +34,13 @@ export default function Navbar() {
           <NavigationMenuItem>
             <Link href="/about" legacyBehavior passHref>
               <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-               Über uns
+                Über uns
               </NavigationMenuLink>
             </Link>
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
-      <div className="absolute right-1 flex items-center">
+      <div className="absolute right-5 flex items-center">
         <ModeToggle />
       </div>
     </div>

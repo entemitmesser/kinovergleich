@@ -17,6 +17,7 @@ import {
 export function DatePicker(props: {
   date: Date | undefined;
   setDate: (type: Date | undefined) => void;
+  className?: string;
 }) {
   return (
     <Popover>
@@ -26,6 +27,7 @@ export function DatePicker(props: {
           className={cn(
             "w-[280px] justify-start text-left font-normal",
             !props.date && "text-muted-foreground",
+            props.className,
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />

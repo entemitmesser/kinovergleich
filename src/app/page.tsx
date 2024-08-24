@@ -1,9 +1,9 @@
-import MovieTable from "~/components/movie-table";
+import MoviePreviewShow from "~/components/movie-show";
 
 export default function HomePage() {
   return (
-    <main className="bg-background flex min-h-screen flex-col items-center">
-      <MovieTable />
+    <main className="flex min-h-screen flex-col items-center bg-background">
+      <MoviePreviewShow />
     </main>
   );
 }
