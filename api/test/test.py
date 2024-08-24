@@ -1,3 +1,12 @@
-arr = [1,2,3,4,5,6,7,8,9,0]
+def reverse(x: int) -> int:
+    x_tostring = str(x)
+    int_list = list(x_tostring)
+    reverse_str = ""
+    for i in range(len(int_list)):
+        int_list.insert(0, int_list[-1])
+        int_list.pop(-1)
+    for x in int_list:
+        reverse_str += x
 
-print("[green]hello holt mich hier raus. \n")
+    return(int(reverse_str))
+

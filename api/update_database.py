@@ -7,6 +7,7 @@ import os
 
 mt = mScraper()
 cm = cmScraper()
+id_counter: int = 0
 try:
     os.mkdir("data")
 except:
@@ -24,24 +25,28 @@ db.execute("""CREATE TABLE movies (
         title text,
         location text,
         url text,
-           poster_url text
+        poster_url text,
+        id integer
 )""")
 db.execute("""CREATE TABLE playtimes (
         title text,
         price text,
         raw_date text,
-        date text   
+        date text,
+        id integer   
 )""")
 conn.commit()
 conn.close()
 
 def mathaeser():
+    global id_counter
     movies = []
     playtime_data = {} #Structure: {title: [[title, price, raw_date, date], ...]}
     for movie in mt.getAllMovies():
         movie_data = {}
         movie_data["title"] = movie
         movie_data["poster_url"] = mt.findPosterForMovies()[movie]
+        movie_data["id"] = id_counter #placeholder
         playtime_data[movie] = []
         playtime_price_tuples = list(zip(mt.findDatesForMovies()[movie], mt.findPriceForMovies()[movie]))
 
@@ -52,36 +57,34 @@ def mathaeser():
                 playtime_Date_object = datetime.strptime(str(playtime), " %d.%m.%Y")
                 date = playtime_Date_object.strftime("%a %d.%m")
                 raw_date = playtime_Date_object.strftime("%d-%m-%Y")
-                data_row.extend([movie, price, raw_date, date])
+                data_row.extend([movie, price, raw_date, date, id_counter])
             except:
-                data_row.extend([movie, "N/A", "N/A", "N/A"])
+                data_row.extend([movie, "N/A", "N/A", "N/A", id_counter])
             playtime_data[movie].append(data_row)
 
         movie_data["location"] = {"name":"Mathäser Filmpalast", "url":"https://www.mathaeser.de/mm/"}
         movies.append(movie_data)
+        id_counter += 1
 
     return(movies, playtime_data)
 
 def cinemaxx():
     movies = []
+    global id_counter
     movie_table_data, playtime_data = cm.getMovieData()
     for movie in movie_table_data:
         movie_data = {}
         movie_data["title"] = movie
         movie_data["poster_url"] = movie_table_data[movie]["poster"]
-        #movie_data["raw_date"] = cm.getMovieData()[movie]["raw_date"]
-        #playtime_price_tuples = list(zip(cm.getMovieData()[movie]["playtime"], cm.getMovieData()[movie]["price"]))
-        ##print(playtime_price_tuples)
+        movie_data["id"] = id_counter
 
-        #movie_data["playtime_price"] = []
+        for playtime_data_row in playtime_data[movie]:
+            playtime_data_row.append(id_counter)
 
-        #for tuple in playtime_price_tuples:
-        #    playtime = tuple[0]
-        #    price = cm.getMovieData()[movie]["price"].replace(",", ".")
-        #    movie_data["playtime_price"].append(f"{playtime} +++ {price}\n")
 
         movie_data["location"] = {"name":"Cinemaxx", "url":"https://www.cinemaxx.de/kinoprogramm/munchen/"}
         movies.append(movie_data)
+        id_counter += 1
 
     return(movies, playtime_data)
 
@@ -102,13 +105,14 @@ def populate_db():
             movie_title = day[0]
             price =  day[1]
             raw_date = day[2]
+            id = day[4]
             for date in day[3]:
                 query="""
                 INSERT INTO playtimes 
-                VALUES (:title, :price, :raw_date, :date)
+                VALUES (:title, :price, :raw_date, :date, :id)
         
                 """
-                local_db.execute(query, {"title":movie_title, "price":price, "raw_date":raw_date, "date":date})
+                local_db.execute(query, {"title":movie_title, "price":price, "raw_date":raw_date, "date":date, "id":id})
                 local_c.commit()
 
     #mathäser
@@ -120,18 +124,20 @@ def populate_db():
             price =  day[1]
             raw_date = day[2]
             date = day[3]
+            id = day[4]
             query="""
             INSERT INTO playtimes 
-            VALUES (:title, :price, :raw_date, :date)
+            VALUES (:title, :price, :raw_date, :date, :id)
     
             """
-            local_db.execute(query, {"title":movie_title, "price":price, "raw_date":raw_date, "date":date})
+            local_db.execute(query, {"title":movie_title, "price":price, "raw_date":raw_date, "date":date, "id":id})
             local_c.commit()
 
             
     for movie_data in all_movies:
         title = movie_data["title"]
         poster_url = str(movie_data["poster_url"])
+        id = movie_data["id"]
         #ptp = str(movie_data["playtime_price"])
         location = movie_data["location"]["name"]
         url = movie_data["location"]["url"]
@@ -139,10 +145,10 @@ def populate_db():
         #if current_ptp[0] != ptp:
         query="""
         INSERT INTO movies 
-        VALUES (:title, :location, :url, :poster_url)
+        VALUES (:title, :location, :url, :poster_url, :id)
 
         """
-        local_db.execute(query, {"title":title, "location":location, "url":url, "poster_url": poster_url})
+        local_db.execute(query, {"title":title, "location":location, "url":url, "poster_url": poster_url, "id":id})
         local_c.commit()
 
 if True:

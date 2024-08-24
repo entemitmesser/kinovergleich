@@ -18,6 +18,17 @@ def get_movies():
         conn = sqlite3.connect("data/movie_data.db")
         db_handler = DatabaseHandler(conn)
         return db_handler.get_movies_by_date(date_arg_value)
+    
+@app.route('/movie')
+def get_movie_by_id():
+    id_arg = request.args.get("id")
+
+    if not id_arg:
+        return 'Error 400: Bad Request. Try changing the id parameter to a valid value', 400
+    else:
+        conn = sqlite3.connect("data/movie_data.db")
+        db_handler = DatabaseHandler(conn)
+        return db_handler.get_movies_by_id(id_arg)
 
 @app.route('/titles')
 def get_titles():

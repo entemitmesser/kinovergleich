@@ -51,6 +51,7 @@ class cmScraper():
                 poster = movie["Poster"]
                 movie_data[title] = {}
                 movie_data[title]["poster"] = poster
+
                 try:
                     playtime_data[title]
                 except KeyError:
@@ -83,12 +84,8 @@ class cmScraper():
                                 break
                         else:
                             print("Duration not available")
-
                         #print()  # Print an empty line between schedules
             
         return(movie_data, playtime_data)
 
-#mdata, pdata = cmScraper().getMovieData()
-#print(mdata)
-#print("\n\n\n\n\n\n\n\n")
-#print(pdata)
+
