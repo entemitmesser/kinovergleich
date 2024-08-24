@@ -72,3 +72,4 @@ dist-ssr
 
 # Virtual environment
 .venv
+venv
