@@ -18,7 +18,7 @@ def get_movies():
         conn = sqlite3.connect("data/movie_data.db")
         db_handler = DatabaseHandler(conn)
         return db_handler.get_movies_by_date(date_arg_value)
-    
+
 @app.route('/movie')
 def get_movie_by_id():
     id_arg = request.args.get("id")
@@ -29,7 +29,7 @@ def get_movie_by_id():
         conn = sqlite3.connect("data/movie_data.db")
         db_handler = DatabaseHandler(conn)
         return db_handler.get_movies_by_id(id_arg)
-    
+
 @app.route('/teekessel')
 def easteregg():
     return "Check The console for further information", 418
@@ -46,9 +46,5 @@ def get_titles():
 
     return formatted
 
-
-
-
 if __name__ == '__main__':
     app.run(debug=True)
-    
