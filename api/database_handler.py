@@ -1,7 +1,9 @@
 from flask import jsonify
+from lib.str_diff import str_diff
+from sqlite3 import Connection
 
 class DatabaseHandler:
-    def __init__(self, connection) -> None:
+    def __init__(self, connection: Connection) -> None:
         self.db_connection = connection
         self.db_cursor = self.db_connection.cursor()
 
@@ -19,11 +21,12 @@ class DatabaseHandler:
             for query_result in all_query_results:
                 formatted_element = f'{query_result[0]} +++ {query_result[1]}'
 
-                try:
-                    if formatted_element != playtimes_array[-1]:
+                if formatted_element != 'N/A +++ N/A':
+                    try:
+                        if formatted_element != playtimes_array[-1]:
+                            playtimes_array.append(formatted_element)
+                    except IndexError:
                         playtimes_array.append(formatted_element)
-                except IndexError:
-                    playtimes_array.append(formatted_element)
 
             item["playtime_price_formatted_json"] = str(playtimes_array)
 
